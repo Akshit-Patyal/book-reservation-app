@@ -42,13 +42,12 @@ const Login = () => {
                 password: password,
               }
             );
-            console.log(result);
-            localStorage.setItem("token", result.data.accessToken);
-            localStorage.setItem("userId", result.data.userResponse.id);
+            sessionStorage.setItem("token", result.data.accessToken);
+            sessionStorage.setItem("userDetails", JSON.stringify(result.data.userResponse));
+            navigate('/profile');
           } catch {
            alert('Wrong username or password');
           }
-        console.log("Login");
     };
 
     return (

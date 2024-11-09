@@ -1,0 +1,21 @@
+.header {
+    background-color: rgb(27, 26, 26);
+    padding: 10px 20px;
+    color: white;
+    align-items: center;
+
+    .tabs{
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 40px;
+        
+        .linkBtn{
+            background-color: transparent;
+            border: none;
+        }
+
+        .linkBtn:hover {
+            background-color: rgb(204, 8, 8);
+          }
+    }
+  }

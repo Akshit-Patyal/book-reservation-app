@@ -1,0 +1,21 @@
+.list-container{
+    background-color: rgb(27, 26, 26);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 40px;
+    color: #fff;
+
+    .book-table{
+        margin: 20px;
+        
+       .book-heading{
+        border: 1px solid white;
+       }
+
+       .book-data{
+        margin-top: 20px;
+       }
+    }
+}
