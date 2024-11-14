@@ -17,12 +17,12 @@ const BookList = () => {
   var userObj = JSON.parse(sessionStorage.userDetails);
   const [bookList, setBookList] = useState<any[]>([]);
   const [deletedBook, setDeletedBook] = useState();
+  const [bookExchanged, setBookExchanged] = useState();
   const [searchValue, setSearchValue] = useState("");
   const [searchFilterValue, setSearchFilterValue] = useState("Title");
   const [showAllBookFlag, setShowAllBookFlag] = useState<boolean>(false);
   const [itemOffset, setItemOffset] = useState(0);
   const endOffset = itemOffset + 5;
-  console.log(`Loading items from ${itemOffset} to ${endOffset}`);
   const currentItems = bookList.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(bookList.length / 5);
 
@@ -55,7 +55,7 @@ const BookList = () => {
   const bookSearchHandler = async () => {
     try {
       const result = await axios.post(
-        "http://localhost:8080/api/v1/book-mgmt/search-books?page=1&size=5",
+        "http://localhost:8080/api/v1/book-mgmt/search-books?page=0&size=5",
         searchPayloadHandler(),
         {
           headers: {
@@ -73,7 +73,6 @@ const BookList = () => {
 
   const showAllBooksHandler = async () => {
     let url = "http://localhost:8080/api/v1/book-mgmt/books";
-    console.log(showAllBookFlag);
     if (showAllBookFlag) {
       url = `http://localhost:8080/api/v1/book-mgmt/books/{userId}?userId=${userObj.id}`;
     }
@@ -92,11 +91,31 @@ const BookList = () => {
     setShowAllBookFlag(!showAllBookFlag);
   };
 
+  const bookExchageHandler = async (
+    book : any
+  ) => {
+    try {
+      const result = await axios.put(
+        `http://localhost:8080/api/v1/book-mgmt/book/${book.id}`,
+        {
+          available: !book.available,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${sessionStorage.token}`,
+          },
+        }
+      );
+      setBookExchanged(result.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handlePageClick = (event: any) => {
     const newOffset = (event.selected * 5) % bookList.length;
-    console.log(
-      `User requested page number ${event.selected}, which is offset ${newOffset}`
-    );
     setItemOffset(newOffset);
   };
 
@@ -122,13 +141,13 @@ const BookList = () => {
     if (searchValue.length === 0) {
       fetchBooksList();
     }
-  }, [userObj.id, deletedBook, searchValue]);
+  }, [userObj.id, deletedBook, searchValue, bookExchanged]);
 
   return (
     <div>
       <Header />
       <div className="list-container">
-        <h2 className="mb-4">List of your Books!</h2>
+        <h2 className="mb-4">{showAllBookFlag ? "List of All Books!" : "List of Your Books!"}</h2>
         <div className="search-container">
           <div className="search-input-container">
             <Dropdown as={ButtonGroup} className="dropdown-container">
@@ -203,15 +222,16 @@ const BookList = () => {
                 <td>{book.title}</td>
                 <td>{book.genre}</td>
                 <td>{book.author}</td>
-                <td>{book.available ? "Yes" : "No"}</td>
+                <td>{book.available === true ? "Yes" : "No"}</td>
                 <td>
                   {showAllBookFlag ? (
                     <Button
                       variant="success"
                       size="sm"
-                      className="exchange-btn"
+                      className={book.available ? "exchange-btn" : "exchanged-btn"} 
+                      onClick={() => {bookExchageHandler(book)}}
                     >
-                      Exchange
+                      {book.available ? "Exchange" : "Exchanged"}
                       <FontAwesomeIcon
                         icon={faArrowRightArrowLeft}
                         className="exchange-icon"
