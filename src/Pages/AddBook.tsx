@@ -2,17 +2,18 @@ import { useState } from "react";
 import Header from "../Components/Header";
 import "./Profile.scss";
 import { Button, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const AddBook = () => {
+  const propData = useLocation();
   var userObj = JSON.parse(sessionStorage.userDetails);
-  const [bookName, setBookName] = useState("");
-  const [bookGenre, setBookGenre] = useState("");
-  const [bookAuthor, setBookAuthor] = useState("");
-  const [location, setLocation] = useState("");
-  const [bookCondition, setBookCondition] = useState("");
-  const [availability, setAvailability] = useState(false);
+  const [bookName, setBookName] = useState(propData?.state?.editFlag ? propData?.state?.updatedBookData?.title : "");
+  const [bookGenre, setBookGenre] = useState(propData?.state?.editFlag ? propData?.state?.updatedBookData?.genre : "");
+  const [bookAuthor, setBookAuthor] = useState(propData?.state?.editFlag ? propData?.state?.updatedBookData?.author : "");
+  const [location, setLocation] = useState(propData?.state?.editFlag ? propData?.state?.updatedBookData?.location : "");
+  const [bookCondition, setBookCondition] = useState(propData?.state?.editFlag ? propData?.state?.updatedBookData?.bookCondition : "");
+  const [availability, setAvailability] = useState(propData?.state?.editFlag ? propData.state?.updatedBookData?.available : true);
 
   const navigate = useNavigate();
 
@@ -23,6 +24,37 @@ const AddBook = () => {
     try {
       const result = await axios.post(
         "http://localhost:8080/api/v1/book-mgmt/book",
+        {
+          userId: userObj.id,
+          title: bookName,
+          author: bookAuthor,
+          genre: bookGenre,
+          condition: bookCondition,
+          location: location,
+          available: availability,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${sessionStorage.token}`,
+          },
+        }
+      );
+      console.log(result);
+      navigate("/bookList");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const updateBookHandler = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    try {
+      const result = await axios.put(
+        `http://localhost:8080/api/v1/book-mgmt/book/${propData?.state?.updatedBookData?.id}`,
         {
           userId: userObj.id,
           title: bookName,
@@ -94,16 +126,18 @@ const AddBook = () => {
                 id="floatingLocation"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+                required
               />
               <Form.Label>Enter Book Location</Form.Label>
             </Form.Group>
             <Form.Group className="form-floating mb-4">
               <Form.Control
                 type="input"
-                placeholder="addLocation"
-                id="floatingLocation"
+                placeholder="addCondition"
+                id="floatingCondition"
                 value={bookCondition}
                 onChange={(e) => setBookCondition(e.target.value)}
+                required
               />
               <Form.Label>Enter Book Condition</Form.Label>
             </Form.Group>
@@ -121,7 +155,7 @@ const AddBook = () => {
                     <input
                       type="radio"
                       value="true"
-                      onChange={() => setAvailability(true)}
+                      onChange={() => setAvailability(!availability)}
                       checked={availability}
                     />
                     Yes
@@ -132,8 +166,8 @@ const AddBook = () => {
                     <input
                       type="radio"
                       value="false"
-                      onChange={() => setAvailability(false)}
-                      checked={availability}
+                      onChange={() => setAvailability(!availability)}
+                      checked={!availability}
                     />
                     No
                   </label>
@@ -143,12 +177,12 @@ const AddBook = () => {
           </div>
           <Button
             className="btnAdd"
-            onClick={addBookHandler}
-            disabled={bookAuthor === "" || bookGenre === "" || bookName === ""}
+            onClick={propData?.state?.editFlag ? updateBookHandler :addBookHandler}
+            disabled={bookAuthor === "" || bookGenre === "" || bookName === "" || location === "" || bookCondition===""}
             variant="danger"
             style={{ width: "400px" }}
           >
-            Add
+           {propData?.state?.editFlag ? "Update" : "Add"}
           </Button>
         </Form>
       </div>

@@ -44,7 +44,7 @@ const Login = () => {
             );
             sessionStorage.setItem("token", result.data.accessToken);
             sessionStorage.setItem("userDetails", JSON.stringify(result.data.userResponse));
-            navigate('/profile');
+            navigate('/profile', {replace: true});
           } catch {
            alert('Wrong username or password');
           }

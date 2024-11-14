@@ -55,19 +55,19 @@ const Profile = () => {
     event.preventDefault();
     if (isEmailValid && passwordValid && currentPassword !== updatedPassword) {
       try {
-        const result = await axios.patch(
+        const result = await axios.put(
           "http://localhost:8080/api/v1/profile/update",
           {
             username: userObj.username,
             email: updatedEmail,
             currentPassword: currentPassword,
-            password: updatedPassword,
+            newPassword: updatedPassword,
           },
           {
             headers: {
               "Content-Type": "application/json",
-              "Accept": "application/json",
-              "Authorization": `Bearer ${sessionStorage.token}`,
+              Accept: "application/json",
+              Authorization: `Bearer ${sessionStorage.token}`,
             },
           }
         );
