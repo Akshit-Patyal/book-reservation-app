@@ -83,6 +83,19 @@
                 background-color: rgb(204, 8, 8);
             }
 
+            .exchanged-btn{
+                background-color: rgb(204, 8, 8);
+                margin-top: 5px;
+
+                .exchange-icon {
+                    margin-left: 7px;
+                }
+            }
+
+            .exchanged-btn:hover {
+                background-color: rgb(25, 135, 84);
+            }
+
             .action-btn {
                 margin-top: 5px;
 
